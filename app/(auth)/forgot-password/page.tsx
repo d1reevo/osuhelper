@@ -38,8 +38,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-zinc-950">
-      <div className="w-full max-w-md p-8 bg-zinc-900 rounded-lg border border-zinc-800">
+    <div className="flex h-screen items-center justify-center bg-[#0a0a1a]">
+      <div className="w-full max-w-md p-8 bg-zinc-900/50 rounded-2xl border border-zinc-800/50 backdrop-blur">
         <h1 className="text-2xl font-bold text-white mb-2">Сброс пароля</h1>
         <p className="text-zinc-400 text-sm mb-6">
           Введите Email аккаунта. Мы сгенерируем новый пароль.

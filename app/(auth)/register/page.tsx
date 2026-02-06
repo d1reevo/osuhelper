@@ -36,9 +36,13 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="flex h-screen items-center justify-center bg-zinc-950">
-            <div className="w-full max-w-md p-8 bg-zinc-900 rounded-lg border border-zinc-800">
-                <h1 className="text-3xl font-bold text-white mb-6">Регистрация</h1>
+        <div className="flex h-screen items-center justify-center bg-[#0a0a1a]">
+            <div className="w-full max-w-md p-8 bg-zinc-900/50 rounded-2xl border border-zinc-800/50 backdrop-blur">
+                <div className="flex justify-center mb-6">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">o!</div>
+                </div>
+                <h1 className="text-2xl font-bold text-white text-center mb-2">Создать аккаунт</h1>
+                <p className="text-zinc-500 text-sm text-center mb-6">Зарегистрируйся, чтобы отслеживать прогресс в osu!</p>
                 <form onSubmit={handleSubmit} className="space-y-4">
                      <div>
                         <Input placeholder="Имя пользователя" value={username} onChange={e => setUsername(e.target.value)} />
@@ -54,10 +58,10 @@ export default function RegisterPage() {
                             {error === "User already exists or error" ? "Пользователь с таким email или именем уже существует" : error}
                         </div>
                     )}
-                    <Button type="submit" className="w-full">Создать аккаунт</Button>
+                    <Button type="submit" className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white border-0 rounded-full h-11">Создать аккаунт</Button>
                 </form>
                 <div className="mt-4 text-center">
-                    <Link href="/login" className="text-zinc-400 hover:text-white">Уже есть аккаунт? Войти</Link>
+                    <Link href="/login" className="text-zinc-500 hover:text-white text-sm transition-colors">Уже есть аккаунт? Войти</Link>
                 </div>
             </div>
         </div>
