@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       client_secret: process.env.OSU_CLIENT_SECRET,
       code,
       grant_type: "authorization_code",
-      redirect_uri: process.env.OSU_REDIRECT_URI,
+      redirect_uri: `${new URL(req.url).origin}/api/osu/callback`,
     });
 
     const { access_token, refresh_token, expires_in } = tokenResponse.data;

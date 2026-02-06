@@ -19,7 +19,7 @@ export default function SettingsPage() {
 
     const connectOsu = () => {
         const clientId = process.env.NEXT_PUBLIC_OSU_CLIENT_ID;
-        const redirectUri = encodeURIComponent("http://localhost:3000/api/osu/callback");
+        const redirectUri = encodeURIComponent(`${window.location.origin}/api/osu/callback`);
         window.location.href = `https://osu.ppy.sh/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=public identify`;
     };
 
