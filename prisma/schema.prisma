@@ -1,0 +1,191 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  email         String    @unique
+  passwordHash  String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // osu! connection
+  osuConnection OsuConnection?
+  
+  // Profile & Settings
+  profileSettings ProfileSettings?
+  
+  // Data
+  snapshots     Snapshot[]
+  recentScores  RecentScore[]
+  goals         Goal[]
+  achievements  UserAchievement[]
+  
+  // Friends
+  sentRequests     FriendRequest[] @relation("SentRequests")
+  receivedRequests FriendRequest[] @relation("ReceivedRequests")
+  
+  friendsAsUser1   Friendship[]    @relation("User1Friends")
+  friendsAsUser2   Friendship[]    @relation("User2Friends")
+}
+
+model OsuConnection {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  osuId             String   @unique // The osu! user ID (integer as string)
+  osuUsername       String
+  accessToken       String
+  refreshToken      String   // Encrypted
+  expiresAt         DateTime
+  
+  // Current stats cache
+  globalRank        Int?
+  countryRank       Int?
+  pp                Float?
+  accuracy          Float?
+  playCount         Int?
+  level             Float?
+  countryCode       String?
+  avatarUrl         String?
+  isRestricted      Boolean  @default(false)
+  
+  lastUpdated       DateTime @default(now())
+}
+
+model ProfileSettings {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  slug              String?  @unique // Custom URL: /u/cool_player
+  privacyLevel      String   @default("public") // public, friends_only, private
+  showPp            Boolean  @default(true)
+  showRank          Boolean  @default(true)
+  theme             String   @default("system")
+  
+  updatedAt         DateTime @updatedAt
+}
+
+model Snapshot {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  date         DateTime @default(now()) // Should be normalized to start of day or similar
+  
+  globalRank   Int
+  countryRank  Int
+  pp           Float
+  accuracy     Float
+  playCount    Int
+  level        Float
+  
+  @@index([userId, date])
+}
+
+model RecentScore {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  osuScoreId   String   @unique // from osu api
+  beatmapId    String
+  beatmapSetId String
+  beatmapTitle String
+  beatmapVersion String
+  artist       String
+  
+  accuracy     Float
+  rank         String   // S, SS, A, etc.
+  maxCombo     Int
+  pp           Float?
+  mods         String   // JSON or comma-separated
+  score        BigInt
+  
+  createdAt    DateTime // When the score was achieved
+  fetchedAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model Goal {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type         String   // PP, RANK, ACCURACY, PLAYCOUNT, FC_COUNT
+  targetValue  Float
+  currentValue Float    @default(0)
+  isCompleted  Boolean  @default(false)
+  
+  deadline     DateTime?
+  createdAt    DateTime @default(now())
+  completedAt  DateTime?
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g. PP_1000
+  title       String
+  description String
+  icon        String?
+  type        String   // MILESTONE, STREAK, SPECIAL
+  threshold   Float?
+  
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  
+  unlockedAt    DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+}
+
+model FriendRequest {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  sender     User     @relation("SentRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("ReceivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+  status     String   @default("PENDING") // PENDING, ACCEPTED, DECLINED
+  createdAt  DateTime @default(now())
+
+  @@unique([senderId, receiverId])
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  user1Id   String
+  user2Id   String
+  user1     User     @relation("User1Friends", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User     @relation("User2Friends", fields: [user2Id], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([user1Id, user2Id])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
