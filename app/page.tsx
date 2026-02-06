@@ -95,7 +95,7 @@ export default async function LandingPage() {
       </main>
 
       <footer className="py-10 border-t text-center text-muted-foreground text-sm">
-        <p>&copy; 2024 osu!Helper. Не связано с ppy.</p>
+        <p>&copy; 2025 osu!Helper. Не связано с ppy.</p>
       </footer>
     </div>
   );
